@@ -105,14 +105,12 @@
   </style>
 </head>
 <body>
-
   <h1>Seja Bem-vindo ao Grupo de Oração Cristo Jovem</h1>
   <h2>É um prazer ter você conosco!</h2>
 
-  <form action="https://script.google.com/macros/s/AKfycbxKeO6oCCNy50V5dYzNbWJdhXkZrRvvVrNHATHDtAeqEz8BafZwPtS7tYZE78afQDfnKg/exec
-" method="POST">
-    <!-- Campo de segurança contra spam -->
-    <input class="hidden-field" type="text" name="token" value="GuBb8UbV25pARu02KVr6">
+  <form action="https://script.google.com/macros/s/AKfycbyeaDm06tu3vz1aSRxJj-W4weJRETH6uX0d4ZM8Fu2B4_qqNDX9q6r2iqOdqgaBIaNMww/exec" method="POST">
+    <!-- Campo de segurança oculto -->
+    <input type="hidden" name="token" value="GuBb8UbV25pARu02KVr6">
 
     <label for="nome">Nome:</label>
     <input type="text" id="nome" name="nome" required>
@@ -133,38 +131,29 @@
   <script>
     document.querySelector('form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const botao = document.querySelector('button');
-      const formOriginal = e.target;
-
+      const botao = e.target.querySelector('button');
+      
       try {
-        // Desativa o botão durante o envio
         botao.disabled = true;
-        botao.innerHTML = 'Enviando...';
+        botao.textContent = 'Enviando...';
 
-        // Cria os dados do formulário
-        const formData = new FormData(formOriginal);
-        
-        // Envia para o Google Script
-        const response = await fetch(formOriginal.action, {
+        const response = await fetch(e.target.action, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: new URLSearchParams(formData)
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams(new FormData(e.target))
         });
 
         if (response.ok) {
-          alert('✅ Cadastro realizado com sucesso!');
-          formOriginal.reset(); // Limpa o formulário
+          alert('✅ Cadastro realizado!');
+          e.target.reset();
         } else {
-          throw new Error('Erro no servidor');
+          throw new Error('Falha no servidor');
         }
       } catch (error) {
-        alert('❌ Erro ao enviar. Por favor, tente novamente mais tarde.');
+        alert('❌ Erro: ' + error.message);
       } finally {
-        // Reativa o botão
         botao.disabled = false;
-        botao.innerHTML = 'Enviar';
+        botao.textContent = 'Enviar';
       }
     });
   </script>
