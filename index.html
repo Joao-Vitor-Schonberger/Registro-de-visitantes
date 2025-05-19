@@ -151,6 +151,7 @@
         }
       } catch (error) {
         alert('❌ Erro: ' + error.message);
+        console.error("Detalhes do erro:", error); // Adicione esta linha
       } finally {
         botao.disabled = false;
         botao.textContent = 'Enviar';
