@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <title>Grupo de Oração Cristo Jovem</title>
   <style>
@@ -93,6 +94,25 @@
       background-color: #2c3a22;
     }
 
+    .anti-spam-field {
+      position: absolute;
+      left: -9999px;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      border: 0;
+    }
+
     /* Mantenha os outros estilos se precisar */
   </style>
 </head>
@@ -102,16 +122,21 @@
 
   <form id="formContato">
     <!-- Campo Anti-Spam Oculto -->
-    <div style="position:absolute;left:-9999px">
-      <input type="text" name="url_site" tabindex="-1">
+    <div class="anti-spam-field">
+      <label for="url_site" class="visually-hidden">Deixe este campo em branco</label>
+      <input type="text" id="url_site" name="url_site" tabindex="-1" autocomplete="off" title="Deixe este campo em branco" placeholder="Deixe em branco">
     </div>
 
-    <label>Nome: <input type="text" id="nome" required></label>
-    <label>Telefone: <input type="tel" id="telefone" placeholder="(xx) xxxxx-xxxx" required></label>
-    <label class="checkbox">
-      <input type="checkbox" id="primeiraVez">
-       Primeira vez no grupo
-    </label>
+    <label for="nome">Nome:</label>
+    <input type="text" id="nome" name="nome" required>
+    <label for="telefone">Telefone:</label>
+    <input type="tel" id="telefone" name="telefone" placeholder="(xx) xxxxx-xxxx" required>
+    <div class="checkbox-container">
+      <label>
+        <input type="checkbox" id="primeiraVez" name="primeiraVez">
+        Primeira vez no grupo
+      </label>
+    </div>
     <button type="submit">Enviar</button>
   </form>
 
@@ -119,27 +144,30 @@
 (function() {
   const scriptURL = 'https://script.google.com/macros/s/AKfycbzT-ClAVoX741Ribcev2vDkJazbfJJitWp6OQ0ovmQngYoHuKriNIf-ER-rTtgz8S4Gjg/exec';
   const form = document.getElementById('formContato');
-  const phoneRegex = /^(\d{2})9\d{8}$/; // Regex simplificada
+  const phoneRegex = /^\d{2}9\d{8}$/; // Regex simplificada para (DD)9XXXXXXXX
 
   form.onsubmit = async (e) => {
     e.preventDefault();
-    
     // Validação Rápida
     const telefone = document.getElementById('telefone').value.replace(/\D/g, '');
     if (!phoneRegex.test(telefone)) {
-      return alert('Telefone inválido! Formato: (DDD) 9XXXXXXXXX');
+      alert('Telefone inválido! Formato: (DD) 9XXXXXXXXX');
+      return;
     }
-
+    // Campo anti-spam
+    if (form.querySelector('[name="url_site"]').value) {
+      return; // Não envia se o campo oculto estiver preenchido
+    }
     try {
       await fetch(scriptURL, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({
           nome: document.getElementById('nome').value.trim(),
           telefone: telefone,
           primeira_vez: document.getElementById('primeiraVez').checked ? 'Sim' : 'Não'
         })
       });
-      
       form.reset();
       alert('Dados salvos com sucesso!');
     } catch (error) {
