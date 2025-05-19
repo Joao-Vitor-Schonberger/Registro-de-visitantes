@@ -2,28 +2,30 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Grupo de Oração Cristo Jovem</title>
   <style>
+    /* CSS Essencial */
     body {
       font-family: Arial, sans-serif;
       margin: 0;
-      padding: 0;
+      padding: 50px 20px;
       min-height: 100vh;
-      background-image: url('https://i.postimg.cc/s2tQtyJw/Joao8.png');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      background-attachment: fixed;
-      color: #ffffff;
+      background: url('https://i.postimg.cc/s2tQtyJw/Joao8.png') fixed center/cover;
+      color: #fff;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 50px 20px;
       text-align: center;
     }
 
+    form {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      width: min(90%, 350px);
+      margin-top: 30px;
+    }
     h1 {
       color: #ffffff;
       font-size: 2em;
@@ -85,78 +87,66 @@
       cursor: pointer;
       font-weight: bold;
       width: 100%;
-      transition: background-color 0.3s;
     }
 
     button:hover {
       background-color: #2c3a22;
     }
 
-    /* Estilo para botão desativado */
-    button:disabled {
-      background-color: #6c757d !important;
-      cursor: not-allowed;
-    }
-
-    /* Esconde o campo de segurança */
-    .hidden-field {
-      display: none;
-    }
+    /* Mantenha os outros estilos se precisar */
   </style>
 </head>
 <body>
   <h1>Seja Bem-vindo ao Grupo de Oração Cristo Jovem</h1>
   <h2>É um prazer ter você conosco!</h2>
 
-  <form action="https://script.google.com/macros/s/AKfycbyeaDm06tu3vz1aSRxJj-W4weJRETH6uX0d4ZM8Fu2B4_qqNDX9q6r2iqOdqgaBIaNMww/exec" method="POST">
-    <!-- Campo de segurança oculto -->
-    <input type="hidden" name="token" value="GuBb8UbV25pARu02KVr6">
-
-    <label for="nome">Nome:</label>
-    <input type="text" id="nome" name="nome" required>
-
-    <label for="telefone">Telefone:</label>
-    <input type="tel" id="telefone" name="telefone" required>
-
-    <div class="checkbox-container">
-      <label>
-        <input type="checkbox" id="primeiraVez" name="primeiraVez">
-        É a minha primeira vez no grupo de oração
-      </label>
+  <form id="formContato">
+    <!-- Campo Anti-Spam Oculto -->
+    <div style="position:absolute;left:-9999px">
+      <input type="text" name="url_site" tabindex="-1">
     </div>
 
+    <label>Nome: <input type="text" id="nome" required></label>
+    <label>Telefone: <input type="tel" id="telefone" placeholder="(11) 91234-5678" required></label>
+    <label class="checkbox">
+      <input type="checkbox" id="primeiraVez">
+       Primeira vez no grupo
+    </label>
     <button type="submit">Enviar</button>
   </form>
 
-  <script>
-    document.querySelector('form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const botao = e.target.querySelector('button');
+<script>
+(function() {
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbwmx7JO8pSWIFOw05iEoayjCbRai2JhyQH4vIHBcQ3FqJI9rjSb8FmvWpaZfSAg4jrnUQ/exec';
+  const form = document.getElementById('formContato');
+  const phoneRegex = /^(\d{2})9\d{8}$/; // Regex simplificada
+
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    
+    // Validação Rápida
+    const telefone = document.getElementById('telefone').value.replace(/\D/g, '');
+    if (!phoneRegex.test(telefone)) {
+      return alert('Telefone inválido! Formato: (DDD) 9XXXXXX');
+    }
+
+    try {
+      await fetch(scriptURL, {
+        method: 'POST',
+        body: new URLSearchParams({
+          nome: document.getElementById('nome').value.trim(),
+          telefone: telefone,
+          primeira_vez: document.getElementById('primeiraVez').checked ? 'Sim' : 'Não'
+        })
+      });
       
-      try {
-        botao.disabled = true;
-        botao.textContent = 'Enviando...';
-
-        const response = await fetch(e.target.action, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams(new FormData(e.target))
-        });
-
-        if (response.ok) {
-          alert('✅ Cadastro realizado!');
-          e.target.reset();
-        } else {
-          throw new Error('Falha no servidor');
-        }
-      } catch (error) {
-        alert('❌ Erro: ' + error.message);
-        console.error("Detalhes do erro:", error); // Adicione esta linha
-      } finally {
-        botao.disabled = false;
-        botao.textContent = 'Enviar';
-      }
-    });
-  </script>
+      form.reset();
+      alert('Dados salvos com sucesso!');
+    } catch (error) {
+      alert('Erro: ' + error.message);
+    }
+  };
+})();
+</script>
 </body>
 </html>
