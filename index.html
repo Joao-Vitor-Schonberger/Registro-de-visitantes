@@ -107,7 +107,7 @@
     </div>
 
     <label>Nome: <input type="text" id="nome" required></label>
-    <label>Telefone: <input type="tel" id="telefone" placeholder="(11) 91234-5678" required></label>
+    <label>Telefone: <input type="tel" id="telefone" placeholder="(xx) xxxxx-xxxx" required></label>
     <label class="checkbox">
       <input type="checkbox" id="primeiraVez">
        Primeira vez no grupo
@@ -127,7 +127,7 @@
     // Validação Rápida
     const telefone = document.getElementById('telefone').value.replace(/\D/g, '');
     if (!phoneRegex.test(telefone)) {
-      return alert('Telefone inválido! Formato: (DDD) 9XXXXXX');
+      return alert('Telefone inválido! Formato: (DDD) 9XXXXXXXXX');
     }
 
     try {
